@@ -168,9 +168,23 @@
         function updateVisualization() {
             const chartType = document.getElementById('chartType').value;
             const metric = document.getElementById('dataMetric').value;
-            
-            const labels = filteredData.map(item => item['Ad set name'] || 'Unnamed');
+
+            // Determine labels based on JSON data properties
+            let labels = [];
+            if (filteredData[0].hasOwnProperty('Region')) {
+                labels = filteredData.map(item => item['Region']);
+            } else if (filteredData[0].hasOwnProperty('Age')) {
+                labels = filteredData.map(item => item['Age']);
+            } else if (filteredData[0].hasOwnProperty('Gender')) {
+                labels = filteredData.map(item => item['Gender']);
+            } else {
+                labels = filteredData.map(item => item['Ad set name'] || 'Unnamed');
+            }
+
             const data = filteredData.map(item => parseFloat(item[metric]) || 0);
+
+            // Generate multi-color array for chart items
+            const colors = data.map((_, i) => `hsl(${i * 45}, 70%, 60%)`);
 
             if (currentChart) {
                 currentChart.destroy();
@@ -184,8 +198,8 @@
                     datasets: [{
                         label: metric,
                         data: data,
-                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: colors,
+                        borderColor: colors,
                         borderWidth: 1
                     }]
                 },
